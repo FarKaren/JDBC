@@ -5,13 +5,15 @@ import lombok.Data;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Properties;
 
 
 public class DatabaseConnection {
     private static Connection connection;
+    private static Properties properties;
     private static final String url = "jdbc:postgresql://localhost:5432/test_db";
     private static final String username = "user";
-    private static final String password = "user";
+    private static final String password = "pass";
     static {
         try {
             Class.forName("org.postgresql.Driver");

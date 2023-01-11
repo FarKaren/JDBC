@@ -1,13 +1,28 @@
+import connection.DatabaseConnection;
+import dao.UserDaoImpl;
+import module.Person;
+
+import java.sql.Connection;
+
 public class Main {
     public static void main(String[] args) {
-        String url = "jdbc:postgresql://localhost:5432/test_db";
-        String user = "user";
-        String password = "user";
+        Connection connection = DatabaseConnection.getConnection();
+        UserDaoImpl service = new UserDaoImpl(connection);
+        //Save person
+        Person person = new Person();
+        person.setName("Mark");
+        service.save(person);
 
-        try {
-            Class.forName("org.postgresql.Driver");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+        //Find person
+        Person fromDb = service.find(1);
+        System.out.println(fromDb.getName());
+
+        //Update person
+        Person updatePerson = new Person();
+        updatePerson.setId(8);
+        updatePerson.setName("Stan");
+        service.update(updatePerson);
+
+
     }
 }

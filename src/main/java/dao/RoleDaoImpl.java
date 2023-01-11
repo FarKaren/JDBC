@@ -1,8 +1,8 @@
 package dao;
 
 import generator.Generator;
+import module.Person;
 import module.Role;
-import module.User;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ public class RoleDaoImpl implements DAO<Role> {
             role = new Role();
             role.setId(rs.getLong("id"));
             role.setRole(rs.getString("role"));
-            role.setUserId(rs.getLong("user_id"));
+            //role.setUserId(rs.getLong("user_id"));
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -41,7 +41,7 @@ public class RoleDaoImpl implements DAO<Role> {
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setLong(1, Generator.generateRoleId());
             ps.setString(2, role.getRole());
-            ps.setLong(3, role.getUserId());
+            //ps.setLong(3, role.getUserId());
 
             ps.executeUpdate();
         } catch (SQLException e) {
@@ -56,7 +56,7 @@ public class RoleDaoImpl implements DAO<Role> {
         try {
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setString(1, role.getRole());
-            ps.setLong(2, role.getUserId());
+            //ps.setLong(2, role.getUserId());
             ps.setLong(3, role.getId());
 
             ps.executeUpdate();
@@ -79,10 +79,10 @@ public class RoleDaoImpl implements DAO<Role> {
 
     }
 
-    public List<User> getUsersByRole(String role) {
+    public List<Person> getUsersByRole(String role) {
         String query = "SELECT * FROM role WHERE role = ?";
         List<Long> usersId = new ArrayList<>();
-        List<User> users = new ArrayList<>();
+        List<Person> users = new ArrayList<>();
         try {
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setString(1, role);
@@ -108,11 +108,11 @@ public class RoleDaoImpl implements DAO<Role> {
 
                 ResultSet rs = ps.executeQuery();
                 while (rs.next()) {
-                    User user = new User();
-                    user.setId(rs.getLong("user_id"));
-                    user.setName(rs.getString("name"));
+                    Person person = new Person();
+                    person.setId(rs.getLong("user_id"));
+                    person.setName(rs.getString("name"));
 
-                    users.add(user);
+                    users.add(person);
                 }
             } catch (SQLException e) {
                 e.printStackTrace();

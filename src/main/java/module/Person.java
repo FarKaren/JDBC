@@ -7,7 +7,7 @@ import java.util.Set;
 
 
 @Data
-public class User {
+public class Person {
     private long id;
     private String name;
     private Set<Role> roles;

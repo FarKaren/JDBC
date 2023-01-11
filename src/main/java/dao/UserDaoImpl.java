@@ -1,14 +1,13 @@
 package dao;
 
-import generator.Generator;
 import module.Role;
-import module.User;
+import module.Person;
 
 import java.sql.*;
 import java.util.*;
 
 
-public class UserDaoImpl implements DAO<User>{
+public class UserDaoImpl implements DAO<Person>{
     private final Connection connection;
 
 
@@ -16,68 +15,42 @@ public class UserDaoImpl implements DAO<User>{
         this.connection = connection;
     }
 
-    public User find(long id) {
-        String query = "SELECT * FROM user AS u join role AS r ON user.role = role.id WHERE id = ?";
-        User user = null;
+    public Person find(long id) {
+        String query = "SELECT * FROM person WHERE id = ?";
+        Person person = null;
         try {
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setLong(1, id);
-            user = new User();
-            Set<Role> roles = new HashSet<Role>();
+            person = new Person();
 
             ResultSet resultSet = ps.executeQuery();
-            user.setId(resultSet.getLong("id"));
-            user.setName(resultSet.getString("name"));
+            resultSet.next();
+            person.setId(resultSet.getLong("id"));
+            person.setName(resultSet.getString("name"));
 
-            while (resultSet.next()){
-                roles.add((Role)resultSet.getObject("r"));
-            }
-            user.setRoles(roles);
-
-            return user;
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return user;
+        return person;
     }
 
-    public void save(User user) {
-        String query = "INSERT INTO user VALUES(?, ?)";
-        long userId = 0;
+    public void save(Person person) {
+        String query = "INSERT INTO Person (name) VALUES(?)";
         try {
             PreparedStatement ps = connection.prepareStatement(query);
-            userId = Generator.generateUserId();
-            ps.setLong(1, userId);
-            ps.setString(2, user.getName());
+            ps.setString(1, person.getName());
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        if(user.getRoles() != null){
-            String roleQuery = "INSERT INTO role VALUES(?, ?, ?)";
-            Set<Role> roles = user.getRoles();
-            Iterator<Role> iterator = roles.iterator();
-            try {
-                PreparedStatement ps = connection.prepareStatement(roleQuery);
-                while (iterator.hasNext()) {
-                    ps.setLong(1, Generator.generateRoleId());
-                    ps.setString(2, iterator.next().getRole());
-                    ps.setLong(3, userId);
-
-                    ps.executeUpdate();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
-    public void update(User user) {
-        String query = "UPDATE user SET name = ? WHERE id = ?";
+    public void update(Person person) {
+        String query = "UPDATE Person SET name = ? WHERE id = ?";
         try {
             PreparedStatement ps = connection.prepareStatement(query);
-            ps.setString(1, user.getName());
-            ps.setLong(2, user.getId());
+            ps.setString(1, person.getName());
+            ps.setLong(2, person.getId());
 
             ps.executeUpdate();
         } catch (SQLException e) {
@@ -86,7 +59,7 @@ public class UserDaoImpl implements DAO<User>{
     }
 
     public void delete(long id) {
-        String query = "DElETE FROM user WHERE id = ?";
+        String query = "DElETE FROM person WHERE id = ?";
         try {
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setLong(1, id);
@@ -98,19 +71,32 @@ public class UserDaoImpl implements DAO<User>{
     }
 
     public List<Role> getRolesByUser(long id){
-        String query = "SELECT * FROM role WHERE user_id = ?";
+        String queryPersonRole = "SELECT * FROM person_role WHERE person_id = ?";
+        String queryGetRoles = "SELECT * FROM role WHERE id = ?";
+        List<Long> ids = new ArrayList<>();
         List<Role> roles = new ArrayList<>();
 
         try {
-            PreparedStatement ps = connection.prepareStatement(query);
+            PreparedStatement ps = connection.prepareStatement(queryPersonRole);
             ps.setLong(1, id);
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next())
+                ids.add(rs.getLong("role_id"));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        try {
+            Array idsArr = connection.createArrayOf("bigint", ids.toArray(new Long[0]));
+            PreparedStatement ps = connection.prepareStatement(queryGetRoles);
+            ps.setArray(1, idsArr);
 
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Role role = new Role();
                 role.setId(rs.getLong("id"));
                 role.setRole(rs.getString("role"));
-                role.setUserId(rs.getLong("user_id"));
+
                 roles.add(role);
             }
         } catch (SQLException e) {

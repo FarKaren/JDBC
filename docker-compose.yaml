@@ -1,0 +1,11 @@
+version: '3.7'
+
+services:
+  jdbc_test:
+    image: postgres:11.4
+    environment:
+      POSTGRES_DB: test_db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+    ports:
+      - "5440:5432"

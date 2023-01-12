@@ -1,6 +1,6 @@
 package dao;
 
-public interface DAO<T> {
+public interface Repository<T> {
      T find(long id);
      void save(T t);
      void update(T t);

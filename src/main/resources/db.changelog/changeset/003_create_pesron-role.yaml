@@ -1,10 +1,10 @@
 databaseChangeLog:
   - changeSet:
-      id: create-user_role
+      id: create-person_role
       author: Karen
       changes:
         - createTable:
-            tableName: user_role
+            tableName: person_role
             columns:
               - column:
                   name: id
@@ -14,10 +14,10 @@ databaseChangeLog:
                     primaryKey: true
                     nullable: false
               - column:
-                  name: userId
+                  name: person_id
                   type: bigint
                     nullable: false
               - column:
-                  name: roleId
+                  name: role_id
                   type: bigint
                     nullable: false
